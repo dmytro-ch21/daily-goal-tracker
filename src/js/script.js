@@ -1,16 +1,13 @@
-// Identify and Select Needed Elements
 const goalForm = document.querySelector("#goal-form");
 const goalInput = document.querySelector("#goal-input");
 const goalList = document.querySelector("#goal-list");
 const clearAll = document.querySelector("#clear-goals-btn");
 
-// Listeners - two arguments 1st (event type) 2nd - callback function
 goalForm.addEventListener("submit", onAddGoalSubmit);
 goalList.addEventListener("click", onGoalDelete);
 clearAll.addEventListener("click", onClearAll);
 document.addEventListener("DOMContentLoaded", displayGoals);
 
-// Function
 function displayGoals() {
   const goalsFromLocalStorage = getGoalsFromLocalStorage();
   goalsFromLocalStorage.forEach((goal) => addGoalToDOM(goal));
@@ -19,60 +16,40 @@ function displayGoals() {
 function onAddGoalSubmit(event) {
   event.preventDefault();
   const newGoal = goalInput.value;
-  // add validation
   if (!goalInput.value) {
     alert("Please enter the goal!");
     return;
   }
-  addGoalToDOM(newGoal);
   goalInput.value = "";
-  // Add the item to local storage
+  addGoalToDOM(newGoal);
   addGoalToLocalStorage(newGoal);
 }
 
-// Add remove functionality
 function onGoalDelete(event) {
-  // we need to make sure that user clicks on icon
-  // console.log(event.target.classList.contains('fa-eraser'));
   if (event.target.classList.contains("fa-eraser")) {
     const goalText = event.target.parentElement.parentElement.innerText;
-
     removeGoal(event.target.parentElement.parentElement);
-    // ["one", 'two', 'three', 'Complete JS Quiz'] Complete JS Quiz !== Complete JS Quiz
-    const localStorageGoals = getGoalsFromLocalStorage();
-    // ["one", 'two', 'three']
-    const filteredGoals = localStorageGoals.filter((item) => item !== goalText);
-    localStorage.setItem("goals", JSON.stringify(filteredGoals));
+    removeFromStorage(goalText);
   }
 }
 
-// Add clear all functionality
-function onClearAll() {
-  // Option 1 - with while
-  // while(goalList.firstChild){
-  //     goalList.removeChild(goalList.firstChild);
-  // }
-
-  // Option 2- with convertion to array and for each
-  Array.from(goalList.children).forEach((goal) => goal.remove());
-  localStorage.clear();
-
-  // Option 3
-  //   goalList.innerHTML = '';
+function removeFromStorage(goal) {
+  const localStorageGoals = getGoalsFromLocalStorage();
+  const filteredGoals = localStorageGoals.filter((item) => item !== goal);
+  localStorage.setItem("goals", JSON.stringify(filteredGoals));
 }
 
-// Helper Functions
+function onClearAll() {
+  Array.from(goalList.children).forEach((goal) => goal.remove());
+  localStorage.clear();
+}
+
 function addGoalToDOM(goal) {
-  // create the list item as parent element
   const li = createListItem();
-  // create the span item that contains the new goal
-  // later we will append to li
   const span = createSpanElement(goal);
   li.appendChild(span);
-  // create the button
   const button = createButton();
   li.appendChild(button);
-  // append the newly created list to the ul
   goalList.appendChild(li);
 }
 
